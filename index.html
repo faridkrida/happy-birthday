@@ -1,61 +1,1133 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="id">
 <head>
-    <title>Happy Birthday</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#130820" />
+  <title>Untuk Deiva Ila Melati 💌</title>
+
+  <!-- Google Fonts: Playfair Display + Cormorant Garamond + Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <!-- canvas-confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* ============================================================
+       CSS CUSTOM PROPERTIES — DESIGN TOKENS
+    ============================================================ */
+    :root {
+      /* Palette */
+      --clr-night:       #0e0618;
+      --clr-plum-dark:   #1a0a2e;
+      --clr-plum:        #2d1040;
+      --clr-rose-wine:   #8b2252;
+      --clr-rose:        #c9607a;
+      --clr-rose-light:  #e8a0bf;
+      --clr-blush:       #f9e4ec;
+      --clr-lavender:    #d8c8ee;
+      --clr-peach:       #ffd6c0;
+      --clr-cream:       #fdf6f0;
+      --clr-white:       #ffffff;
+
+      /* Typography */
+      --ff-display:  'Playfair Display', Georgia, serif;
+      --ff-body:     'Cormorant Garamond', Georgia, serif;
+      --ff-ui:       'Poppins', system-ui, sans-serif;
+
+      /* Transitions */
+      --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+      --ease-in-out:   cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      height: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      height: 100%;
+      overflow: hidden;         /* screens handle their own overflow */
+      font-family: var(--ff-ui);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: var(--clr-night);
+      color: var(--clr-white);
+      cursor: default;
+      user-select: none;
+    }
+
+    /* ============================================================
+       CANVAS — confetti lives here
+    ============================================================ */
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ============================================================
+       AUDIO — kept hidden; src="music.mp3" (repo asset)
+    ============================================================ */
+    /* The <audio> tag is in the HTML below. Controls are hidden. */
+
+    /* ============================================================
+       MUSIC INDICATOR — fixed, bottom-left
+    ============================================================ */
+    #music-indicator {
+      position: fixed;
+      bottom: 24px;
+      left: 20px;
+      z-index: 900;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 16px;
+      border-radius: 40px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      pointer-events: none;
+    }
+
+    #music-indicator.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .eq-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 2.5px;
+      height: 16px;
+    }
+
+    .eq-bar {
+      width: 3px;
+      background: var(--clr-rose-light);
+      border-radius: 2px;
+      transform-origin: bottom;
+      animation: eqBounce var(--dur, 0.8s) ease-in-out infinite alternate;
+      animation-delay: var(--delay, 0s);
+    }
+
+    @keyframes eqBounce {
+      0%   { height: 3px;  opacity: 0.5; }
+      100% { height: 14px; opacity: 1;   }
+    }
+
+    .music-label {
+      font-family: var(--ff-ui);
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    /* ============================================================
+       PROGRESS DOTS — screen navigation
+    ============================================================ */
+    #progress-dots {
+      position: fixed;
+      bottom: 28px;
+      right: 20px;
+      z-index: 900;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    #progress-dots.visible { opacity: 1; }
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      transition: all 0.4s var(--ease-out-expo);
+    }
+
+    .dot.active {
+      width: 18px;
+      border-radius: 3px;
+      background: var(--clr-rose-light);
+    }
+
+    /* ============================================================
+       FLOATING PARTICLES — pure CSS, behind all screens
+    ============================================================ */
+    #particle-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      bottom: -60px;
+      font-size: var(--size, 1rem);
+      left: var(--x, 50%);
+      opacity: 0;
+      animation: particleRise var(--dur, 10s) ease-in var(--delay, 0s) infinite;
+      filter: blur(var(--blur, 0px));
+      will-change: transform, opacity;
+    }
+
+    @keyframes particleRise {
+      0%   { transform: translateY(0) rotate(var(--r0, 0deg));   opacity: 0; }
+      8%   { opacity: var(--op, 0.35); }
+      90%  { opacity: var(--op, 0.35); }
+      100% { transform: translateY(-105vh) rotate(var(--r1, 20deg)); opacity: 0; }
+    }
+
+    /* ============================================================
+       SCREEN — base class for all 5 screens
+    ============================================================ */
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 28px;
+      z-index: 10;
+
+      /* State: hidden by default */
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition:
+        opacity 0.75s var(--ease-in-out),
+        visibility 0.75s;
+    }
+
+    .screen.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    /* ============================================================
+       SCREEN 0 — LANDING (dark romantic)
+    ============================================================ */
+    #screen-0 {
+      background:
+        radial-gradient(ellipse at 25% 25%, rgba(139, 34, 82, 0.4) 0%, transparent 55%),
+        radial-gradient(ellipse at 75% 75%, rgba(80, 40, 120, 0.35) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 50%, rgba(45, 16, 64, 0.6) 0%, transparent 80%),
+        linear-gradient(160deg, #0e0618 0%, #1a0a2e 50%, #130820 100%);
+      z-index: 50; /* on top initially */
+    }
+
+    /* Twinkling stars */
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--clr-white);
+      animation: starTwinkle var(--dur, 3s) ease-in-out var(--delay, 0s) infinite;
+    }
+
+    @keyframes starTwinkle {
+      0%, 100% { opacity: 0; transform: scale(0.4); }
+      50%       { opacity: var(--op, 0.6); transform: scale(1); }
+    }
+
+    /* Landing content */
+    .landing-eyebrow {
+      font-family: var(--ff-body);
+      font-style: italic;
+      font-size: clamp(0.9rem, 3vw, 1.1rem);
+      font-weight: 300;
+      color: rgba(232, 160, 191, 0.55);
+      letter-spacing: 0.1em;
+      margin-bottom: 36px;
+      animation: fadeSlideUp 1.2s var(--ease-out-expo) 0.3s both;
+    }
+
+    .landing-btn-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Pulse rings */
+    .pulse-ring {
+      position: absolute;
+      inset: -16px;
+      border-radius: 50%;
+      border: 1px solid rgba(201, 96, 122, 0.3);
+      animation: pulseRing 2.2s ease-out infinite;
+    }
+    .pulse-ring:nth-child(2) { animation-delay: 0.75s; }
+    .pulse-ring:nth-child(3) { animation-delay: 1.5s; }
+
+    @keyframes pulseRing {
+      0%   { transform: scale(0.85); opacity: 0.5; }
+      100% { transform: scale(1.7);  opacity: 0;   }
+    }
+
+    #btn-start {
+      position: relative;
+      z-index: 2;
+      padding: 20px 44px;
+      border: none;
+      border-radius: 60px;
+      cursor: pointer;
+      outline: none;
+
+      font-family: var(--ff-display);
+      font-size: clamp(1rem, 4vw, 1.15rem);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--clr-white);
+      letter-spacing: 0.02em;
+
+      background: linear-gradient(135deg, #c9607a 0%, #9b4f8e 50%, #c9607a 100%);
+      background-size: 200% 100%;
+      animation: btnShimmer 3.5s ease-in-out infinite, fadeSlideUp 1s var(--ease-out-expo) 0.6s both;
+
+      box-shadow:
+        0 0 36px rgba(201, 96, 122, 0.55),
+        0 0 72px rgba(155, 79, 142, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
+
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #btn-start::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 63px;
+      background: inherit;
+      filter: blur(12px);
+      opacity: 0.45;
+      z-index: -1;
+    }
+
+    @keyframes btnShimmer {
+      0%, 100% { background-position: 0% 50%; }
+      50%       { background-position: 100% 50%; }
+    }
+
+    #btn-start:hover  { transform: scale(1.04) translateY(-3px); }
+    #btn-start:active { transform: scale(0.97); }
+
+    .landing-hint {
+      margin-top: 24px;
+      font-family: var(--ff-ui);
+      font-size: 0.65rem;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.22);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      animation: breathe 3s ease-in-out 1.2s infinite both;
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 0.3; }
+      50%       { opacity: 0.7; }
+    }
+
+    /* ============================================================
+       SCREEN 1 — "Hai..."
+    ============================================================ */
+    #screen-1 {
+      background:
+        radial-gradient(ellipse at 30% 40%, rgba(216, 200, 238, 0.45) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 60%, rgba(248, 200, 210, 0.35) 0%, transparent 55%),
+        linear-gradient(150deg, #f9f0fc 0%, #fdf0f8 40%, #f5ecfa 100%);
+    }
+
+    /* ============================================================
+       SCREEN 2 — "Ada pesan khusus..."
+    ============================================================ */
+    #screen-2 {
+      background:
+        radial-gradient(ellipse at 60% 30%, rgba(255, 214, 192, 0.5) 0%, transparent 55%),
+        radial-gradient(ellipse at 20% 70%, rgba(216, 200, 238, 0.4) 0%, transparent 55%),
+        linear-gradient(145deg, #fdf4f8 0%, #fdf0ec 50%, #faf0f8 100%);
+    }
+
+    /* ============================================================
+       SCREEN 3 — "Happy Birthday..."
+    ============================================================ */
+    #screen-3 {
+      background:
+        radial-gradient(ellipse at 50% 20%, rgba(249, 228, 236, 0.8) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 80%, rgba(216, 200, 238, 0.5) 0%, transparent 45%),
+        radial-gradient(ellipse at 80% 70%, rgba(255, 214, 192, 0.45) 0%, transparent 45%),
+        linear-gradient(160deg, #fff0f5 0%, #fdf5ff 50%, #fff5f0 100%);
+    }
+
+    /* ============================================================
+       SCREEN 4 — PESAN UTAMA
+    ============================================================ */
+    #screen-4 {
+      background:
+        radial-gradient(ellipse at 20% 15%, rgba(248, 187, 208, 0.55) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 85%, rgba(209, 186, 230, 0.45) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(255, 240, 245, 0.5) 0%, transparent 70%),
+        linear-gradient(155deg, #fdf0f5 0%, #f9ecf7 40%, #fff8f0 100%);
+      overflow-y: auto;
+      padding: 32px 20px 80px;
+      justify-content: flex-start;
+    }
+
+    /* ============================================================
+       CONTENT ELEMENTS — shared across screens
+    ============================================================ */
+
+    /* Generic fade+slide-up for screen content */
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition:
+        opacity 0.85s var(--ease-out-expo),
+        transform 0.85s var(--ease-out-expo);
+    }
+
+    /* When a screen is active, .reveal children animate in via JS stagger */
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ---- Screen 1, 2: single word/line ---- */
+    .screen-word {
+      font-family: var(--ff-display);
+      font-weight: 700;
+      font-size: clamp(3.2rem, 14vw, 6rem);
+      line-height: 1.1;
+      text-align: center;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #8b2252 0%, #c9607a 40%, #9b4f8e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .screen-subword {
+      font-family: var(--ff-body);
+      font-style: italic;
+      font-size: clamp(1.1rem, 4.5vw, 1.5rem);
+      font-weight: 300;
+      color: rgba(100, 40, 70, 0.5);
+      letter-spacing: 0.06em;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    /* Tap cue */
+    .tap-cue {
+      position: absolute;
+      bottom: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--ff-ui);
+      font-size: 0.62rem;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(139, 34, 82, 0.35);
+      animation: breathe 2.5s ease-in-out infinite;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tap-arrow {
+      display: inline-block;
+      animation: tapBounce 1.5s ease-in-out infinite;
+    }
+
+    @keyframes tapBounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(4px); }
+    }
+
+    /* ---- Screen 3: Birthday title ---- */
+    .bday-label {
+      font-family: var(--ff-ui);
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(201, 96, 122, 0.65);
+      margin-bottom: 16px;
+    }
+
+    .bday-title {
+      font-family: var(--ff-display);
+      font-weight: 700;
+      font-size: clamp(2.2rem, 9vw, 3.8rem);
+      line-height: 1.2;
+      text-align: center;
+      letter-spacing: -0.01em;
+      background: linear-gradient(135deg, #7a1c48 0%, #c9607a 45%, #9b4f8e 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: textShimmer 4s ease-in-out infinite;
+    }
+
+    @keyframes textShimmer {
+      0%, 100% { background-position: 0% center; }
+      50%       { background-position: 100% center; }
+    }
+
+    .bday-sparkle {
+      -webkit-text-fill-color: initial;
+      font-size: 0.75em;
+    }
+
+    .cake-icon {
+      font-size: clamp(4.5rem, 16vw, 6.5rem);
+      line-height: 1;
+      margin: 20px 0;
+      display: block;
+      text-align: center;
+      filter: drop-shadow(0 6px 18px rgba(201, 96, 122, 0.3));
+      animation: cakeBounce 3.5s ease-in-out 0.5s infinite;
+    }
+
+    @keyframes cakeBounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50%       { transform: translateY(-10px) scale(1.04); }
+    }
+
+    .divider-ornament {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 12px auto;
+      width: 180px;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,96,122,0.35), transparent);
+    }
+
+    .divider-glyph {
+      color: var(--clr-rose);
+      font-size: 0.8rem;
+      opacity: 0.6;
+    }
+
+    /* ---- Screen 4: Message card ---- */
+    .msg-header {
+      width: 100%;
+      max-width: 580px;
+      margin: 0 auto 24px;
+      text-align: center;
+    }
+
+    .msg-eyebrow {
+      font-family: var(--ff-ui);
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(201, 96, 122, 0.6);
+      margin-bottom: 10px;
+    }
+
+    .msg-title {
+      font-family: var(--ff-display);
+      font-size: clamp(1.4rem, 5.5vw, 2.2rem);
+      font-weight: 600;
+      font-style: italic;
+      color: #7a1c48;
+      line-height: 1.3;
+    }
+
+    /* Glass card */
+    .msg-card {
+      width: 100%;
+      max-width: 580px;
+      margin: 0 auto;
+      padding: clamp(28px, 7vw, 48px) clamp(24px, 6vw, 42px);
+      border-radius: 28px;
+      position: relative;
+      overflow: hidden;
+
+      background: rgba(255, 255, 255, 0.58);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow:
+        0 8px 40px rgba(201, 96, 122, 0.12),
+        0 2px 8px rgba(201, 96, 122, 0.07),
+        inset 0 1px 0 rgba(255,255,255,0.95);
+    }
+
+    /* Decorative corner flourishes */
+    .msg-card::before,
+    .msg-card::after {
+      content: '✦';
+      position: absolute;
+      font-size: 1.6rem;
+      color: rgba(201, 96, 122, 0.15);
+    }
+    .msg-card::before { top: 18px; right: 22px; animation: spin 18s linear infinite; }
+    .msg-card::after  { bottom: 16px; left: 20px; font-size: 1rem; animation: spin 25s linear infinite reverse; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .msg-body {
+      font-family: var(--ff-body);
+      font-size: clamp(1.1rem, 3.8vw, 1.28rem);
+      font-weight: 400;
+      line-height: 1.9;
+      color: #3d1a28;
+      text-align: center;
+      letter-spacing: 0.01em;
+    }
+
+    .msg-body em {
+      font-style: italic;
+      color: var(--clr-rose);
+      font-weight: 400;
+    }
+
+    /* Signature */
+    .msg-signature {
+      margin-top: 28px;
+      text-align: center;
+    }
+
+    .msg-signature-text {
+      font-family: var(--ff-display);
+      font-style: italic;
+      font-size: clamp(0.85rem, 2.5vw, 1rem);
+      color: rgba(139, 34, 82, 0.4);
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .hearts-row {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      font-size: 1.2rem;
+      animation: breathe 2.5s ease-in-out infinite;
+    }
+
+    /* Footer ribbon */
+    .msg-ribbon {
+      width: 100%;
+      max-width: 580px;
+      margin: 24px auto 0;
+      text-align: center;
+    }
+
+    .ribbon-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      border-radius: 50px;
+      background: rgba(201, 96, 122, 0.09);
+      border: 1px solid rgba(201, 96, 122, 0.15);
+    }
+
+    .ribbon-text {
+      font-family: var(--ff-ui);
+      font-size: 0.65rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(139, 34, 82, 0.55);
+    }
+
+    /* ============================================================
+       UTILITY KEYFRAMES
+    ============================================================ */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+
+    /* ============================================================
+       RESPONSIVE FINE-TUNING
+    ============================================================ */
+    @media (max-width: 380px) {
+      #btn-start { padding: 18px 36px; }
+      .msg-card  { padding: 24px 20px; border-radius: 22px; }
+      #screen-4  { padding: 24px 16px 80px; }
+    }
+
+    @media (min-height: 750px) {
+      #screen-4 { justify-content: center; }
+    }
+  </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="loader">
-                <button id="play">Start</button>
-            </div>
-        </div>
+
+  <!-- ============================================================
+       AUDIO — menggunakan music.mp3 dari repo (sudah ada)
+       Volume dapat diatur di JS di bawah.
+  ============================================================ -->
+  <audio id="audio" loop preload="none">
+    <source src="music.mp3" type="audio/mpeg" />
+  </audio>
+
+  <!-- ============================================================
+       CONFETTI CANVAS
+  ============================================================ -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- ============================================================
+       MUSIC INDICATOR
+  ============================================================ -->
+  <div id="music-indicator" aria-hidden="true">
+    <div class="eq-bars">
+      <div class="eq-bar" style="--dur:0.6s; --delay:0.0s;"></div>
+      <div class="eq-bar" style="--dur:0.8s; --delay:0.1s;"></div>
+      <div class="eq-bar" style="--dur:0.5s; --delay:0.2s;"></div>
+      <div class="eq-bar" style="--dur:0.9s; --delay:0.05s;"></div>
+      <div class="eq-bar" style="--dur:0.7s; --delay:0.15s;"></div>
     </div>
-    <audio class="song" controls loop>
-        <source src="music.mp3">
-        </source>
-        Your browser isn't invited for super fun audio time.
-    </audio>
-    <canvas id="confetti"></canvas>
-    <div class="main">
-        <div class="container pt-5">
-            <div class="row">
+    <span class="music-label">Now Playing</span>
+  </div>
 
-                <div class="col-12 col-xl-6 mx-auto">
-                    <img src="img/banner.png" alt="">
-                </div>
+  <!-- ============================================================
+       PROGRESS DOTS
+  ============================================================ -->
+  <div id="progress-dots" aria-hidden="true">
+    <!-- dots injected by JS -->
+  </div>
 
-                <div class="col-12  text-center">
-                    <div id="name" class="area">Gaurav</div>
-                </div>
+  <!-- ============================================================
+       PARTICLE LAYER (floating hearts / petals)
+  ============================================================ -->
+  <div id="particle-layer" aria-hidden="true">
+    <!-- particles injected by JS -->
+  </div>
 
-                <div class="col-12 text-center">
-                    <div class="type-wrap">
-                        <div id="typed-strings" class="typing">
-                            <h2>Happy Birthday <i id="nae">Gaurav</i></h2>
-                            <h2>Have a wonderful day</h2>
-                            <h2>Filled with joy and happiness.</h2>
-                        </div>
-                        <span id="typed" style="white-space:pre;"></span>
-                    </div>
-                </div>
+  <!-- ============================================================
+       SCREEN 0 — LANDING
+  ============================================================ -->
+  <div id="screen-0" class="screen active" role="main">
+    <div id="stars-wrap" aria-hidden="true"></div>
 
-                <div class="col-12 col-xl-3 cake">
-                    <img src="img/cake.gif" alt="">
-                </div>
-            </div>
-        </div>
-        <img src="img/Balloon-Border.png" width="100%" class="balloon-border">
+    <p class="landing-eyebrow">untuk kamu yang spesial ✨</p>
+
+    <div class="landing-btn-wrap">
+      <div class="pulse-ring" aria-hidden="true"></div>
+      <div class="pulse-ring" aria-hidden="true"></div>
+      <div class="pulse-ring" aria-hidden="true"></div>
+      <button id="btn-start" aria-label="Buka pesan ulang tahun">
+        Ada pesan buat kamu, klik ya! 💌
+      </button>
     </div>
+
+    <p class="landing-hint">ketuk untuk membuka</p>
+  </div>
+
+  <!-- ============================================================
+       SCREEN 1 — "Hai..."
+  ============================================================ -->
+  <div id="screen-1" class="screen" role="region" aria-label="Layar 1">
+    <p class="screen-word reveal" data-delay="0">Hai...</p>
+    <p class="screen-subword reveal" data-delay="150">ada yang ingin aku sampaikan.</p>
+    <div class="tap-cue" aria-hidden="true">
+      <span>ketuk untuk lanjut</span>
+      <span class="tap-arrow">↓</span>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SCREEN 2 — "Ada pesan khusus..."
+  ============================================================ -->
+  <div id="screen-2" class="screen" role="region" aria-label="Layar 2">
+    <p class="screen-word reveal" data-delay="0" style="font-size: clamp(1.6rem,7vw,3rem); font-weight:600;">
+      Ada pesan khusus nih buat kamu.
+    </p>
+    <p class="screen-subword reveal" data-delay="200">khusus, beneran. 🤍</p>
+    <div class="tap-cue" aria-hidden="true">
+      <span>ketuk untuk lanjut</span>
+      <span class="tap-arrow">↓</span>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SCREEN 3 — "Happy Birthday, Deiva Ila Melati!"
+  ============================================================ -->
+  <div id="screen-3" class="screen" role="region" aria-label="Layar 3">
+    <p class="bday-label reveal" data-delay="0">🎀 — for you —</p>
+
+    <h1 class="bday-title reveal" data-delay="100">
+      Happy Birthday,<br/>
+      Deiva Ila Melati!
+      <span class="bday-sparkle" aria-hidden="true"> ✨</span>
+    </h1>
+
+    <span class="cake-icon reveal" data-delay="250" role="img" aria-label="Kue ulang tahun">🎂</span>
+
+    <div class="divider-ornament reveal" data-delay="350" aria-hidden="true">
+      <div class="divider-line"></div>
+      <span class="divider-glyph">❦</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="tap-cue" aria-hidden="true">
+      <span>ketuk untuk lanjut</span>
+      <span class="tap-arrow">↓</span>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SCREEN 4 — PESAN UTAMA
+  ============================================================ -->
+  <div id="screen-4" class="screen" role="region" aria-label="Layar pesan utama">
+
+    <div class="msg-header">
+      <p class="msg-eyebrow reveal" data-delay="0">🌹 — pesan untukmu —</p>
+      <h2 class="msg-title reveal" data-delay="100">Selamat Ulang Tahun</h2>
+    </div>
+
+    <div class="msg-card reveal" data-delay="220">
+      <p class="msg-body">
+        Selamat ulang tahun, <em>Deiva Ila Melati</em>.
+        <br/><br/>
+        Jarak mungkin bikin kita nggak bisa tiup lilin bareng hari ini, tapi nggak akan pernah bisa ngurangin rasa sayangku ke kamu.
+        <br/><br/>
+        Semoga hari-harimu selalu dikelilingi hal-hal baik. Tetap semangat jalani hari, dan ingat kalau di sini selalu ada aku yang bangga banget sama kamu.
+        <br/><br/>
+        Sampai ketemu secepatnya, ya! <em>🤍</em>
+      </p>
+
+      <div class="msg-signature">
+        <p class="msg-signature-text">— with all my love</p>
+        <div class="hearts-row" aria-hidden="true">
+          <span>🩷</span><span>🤍</span><span>💜</span><span>🤍</span><span>🩷</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="msg-ribbon reveal" data-delay="380">
+      <div class="ribbon-pill">
+        <span aria-hidden="true">🎉</span>
+        <span class="ribbon-text">semoga hari ini penuh kebahagiaan</span>
+        <span aria-hidden="true">🎉</span>
+      </div>
+    </div>
+
+  </div><!-- end #screen-4 -->
+
+  <!-- ============================================================
+       JAVASCRIPT
+  ============================================================ -->
+  <script>
+    'use strict';
+
+    /* ──────────────────────────────────────────────────────────
+       CONFIG
+    ────────────────────────────────────────────────────────── */
+    const TOTAL_SCREENS = 4;        // screen-1 … screen-4 (screen-0 is landing)
+    const AUTO_ADVANCE_DELAYS = [
+      0,      // screen-1: manual tap only (or 3.5s)
+      0,      // screen-2: manual tap only
+      0,      // screen-3: manual tap only
+      0,      // screen-4: no auto-advance
+    ];
+    // Set to > 0 (ms) if you want auto-advance; 0 = manual tap only
+
+    const PARTICLE_SYMBOLS = ['🩷', '💗', '✿', '♡', '❀', '🌸', '💕', '✦', '·', '°'];
+
+    /* ──────────────────────────────────────────────────────────
+       STATE
+    ────────────────────────────────────────────────────────── */
+    let currentScreen = 0;    // 0 = landing
+    let transitioning  = false;
+    const myConfetti   = confetti.create(
+      document.getElementById('confetti-canvas'),
+      { resize: true, useWorker: true }
+    );
+
+    /* ──────────────────────────────────────────────────────────
+       1. GENERATE TWINKLING STARS (landing bg)
+    ────────────────────────────────────────────────────────── */
+    (function buildStars() {
+      const wrap  = document.getElementById('stars-wrap');
+      const count = 90;
+      for (let i = 0; i < count; i++) {
+        const s    = document.createElement('div');
+        s.className = 'star';
+        const sz   = Math.random() * 2.5 + 0.4;
+        s.style.cssText = `
+          width:${sz}px; height:${sz}px;
+          top:${Math.random()*100}%; left:${Math.random()*100}%;
+          --dur:${(Math.random()*3+1.5).toFixed(2)}s;
+          --delay:${(Math.random()*5).toFixed(2)}s;
+          --op:${(Math.random()*0.55+0.15).toFixed(2)};
+          animation-delay:var(--delay);
+        `;
+        wrap.appendChild(s);
+      }
+    })();
+
+    /* ──────────────────────────────────────────────────────────
+       2. GENERATE FLOATING PARTICLES
+    ────────────────────────────────────────────────────────── */
+    (function buildParticles() {
+      const layer = document.getElementById('particle-layer');
+      const count = 22;
+      for (let i = 0; i < count; i++) {
+        const el     = document.createElement('div');
+        el.className = 'particle';
+        const sym    = PARTICLE_SYMBOLS[Math.floor(Math.random() * PARTICLE_SYMBOLS.length)];
+        const sz     = (Math.random() * 1.2 + 0.6).toFixed(2);
+        const blur   = Math.random() > 0.55 ? (Math.random() * 1.5 + 0.5).toFixed(1) : 0;
+        const op     = (Math.random() * 0.28 + 0.1).toFixed(2);
+        el.textContent = sym;
+        el.style.cssText = `
+          --size:${sz}rem;
+          --x:${(Math.random()*92+4).toFixed(1)}%;
+          --dur:${(Math.random()*9+7).toFixed(1)}s;
+          --delay:${(Math.random()*12).toFixed(1)}s;
+          --blur:${blur}px;
+          --op:${op};
+          --r0:${(Math.random()*30-15).toFixed(0)}deg;
+          --r1:${(Math.random()*30-15).toFixed(0)}deg;
+          font-size:${sz}rem;
+        `;
+        layer.appendChild(el);
+      }
+    })();
+
+    /* ──────────────────────────────────────────────────────────
+       3. PROGRESS DOTS
+    ────────────────────────────────────────────────────────── */
+    const dotsWrap = document.getElementById('progress-dots');
+    for (let i = 0; i < TOTAL_SCREENS; i++) {
+      const d = document.createElement('div');
+      d.className = 'dot';
+      d.dataset.idx = i + 1;  // dots represent screen-1 to screen-4
+      dotsWrap.appendChild(d);
+    }
+
+    function updateDots(screenNum) {
+      // screenNum is 1-based (1 = screen-1)
+      document.querySelectorAll('.dot').forEach((d, idx) => {
+        d.classList.toggle('active', idx + 1 === screenNum);
+      });
+    }
+
+    /* ──────────────────────────────────────────────────────────
+       4. REVEAL ELEMENTS WITHIN A SCREEN
+    ────────────────────────────────────────────────────────── */
+    function revealScreen(screenEl) {
+      const items = screenEl.querySelectorAll('.reveal');
+      items.forEach(item => {
+        item.classList.remove('in');
+        const delay = parseInt(item.dataset.delay || 0, 10);
+        // stagger from 180ms base
+        setTimeout(() => item.classList.add('in'), 180 + delay);
+      });
+    }
+
+    /* ──────────────────────────────────────────────────────────
+       5. SCREEN TRANSITION
+    ────────────────────────────────────────────────────────── */
+    function goToScreen(targetNum) {
+      if (transitioning) return;
+      if (targetNum === currentScreen) return;
+      if (targetNum > TOTAL_SCREENS) return;
+
+      transitioning = true;
+
+      const fromEl = document.getElementById(`screen-${currentScreen}`);
+      const toEl   = document.getElementById(`screen-${targetNum}`);
+
+      // Fade out current
+      fromEl.classList.remove('active');
+
+      // After transition, activate next
+      setTimeout(() => {
+        fromEl.style.zIndex = '';
+
+        toEl.style.zIndex = '10';
+        toEl.classList.add('active');
+        revealScreen(toEl);
+
+        currentScreen = targetNum;
+        transitioning = false;
+
+        // Update UI
+        if (targetNum >= 1) {
+          dotsWrap.classList.add('visible');
+          updateDots(targetNum);
+        }
+
+        // Special: fire confetti on screen-3
+        if (targetNum === 3) {
+          setTimeout(launchConfetti, 350);
+        }
+
+        // Auto-advance if configured
+        const delay = AUTO_ADVANCE_DELAYS[targetNum - 1];
+        if (delay > 0 && targetNum < TOTAL_SCREENS) {
+          setTimeout(() => goToScreen(targetNum + 1), delay);
+        }
+      }, 780); // matches CSS transition duration
+    }
+
+    /* ──────────────────────────────────────────────────────────
+       6. CONFETTI
+    ────────────────────────────────────────────────────────── */
+    const CONFETTI_COLORS = [
+      '#F4C2C2', '#c9607a', '#D8C8EE', '#B39DDB',
+      '#FFD6C0', '#ffffff', '#f9a8d4', '#fde68a'
+    ];
+
+    function launchConfetti() {
+      // Burst from top-left
+      myConfetti({
+        particleCount: 90,
+        angle: 55,
+        spread: 65,
+        origin: { x: 0, y: 0.15 },
+        colors: CONFETTI_COLORS,
+        scalar: 0.95,
+        gravity: 0.9,
+        drift: 0.1,
+      });
+
+      // Burst from top-right
+      setTimeout(() => {
+        myConfetti({
+          particleCount: 90,
+          angle: 125,
+          spread: 65,
+          origin: { x: 1, y: 0.15 },
+          colors: CONFETTI_COLORS,
+          scalar: 0.95,
+          gravity: 0.9,
+          drift: -0.1,
+        });
+      }, 300);
+
+      // Soft rain from center-top
+      setTimeout(() => {
+        myConfetti({
+          particleCount: 60,
+          angle: 90,
+          spread: 120,
+          origin: { x: 0.5, y: 0 },
+          colors: CONFETTI_COLORS,
+          scalar: 0.75,
+          gravity: 0.65,
+        });
+      }, 700);
+    }
+
+    /* ──────────────────────────────────────────────────────────
+       7. MUSIC
+    ────────────────────────────────────────────────────────── */
+    const audio           = document.getElementById('audio');
+    const musicIndicator  = document.getElementById('music-indicator');
+
+    function startMusic() {
+      audio.volume = 0.45;
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            // Music started successfully → show indicator
+            musicIndicator.classList.add('visible');
+          })
+          .catch(() => {
+            // Autoplay blocked (rare after user tap) — silently ignore
+          });
+      }
+    }
+
+    /* ──────────────────────────────────────────────────────────
+       8. START BUTTON — kick everything off
+    ────────────────────────────────────────────────────────── */
+    document.getElementById('btn-start').addEventListener('click', function () {
+      // Start music (user gesture satisfies autoplay policy)
+      startMusic();
+
+      // Transition: landing (0) → screen-1
+      const landing = document.getElementById('screen-0');
+      landing.style.zIndex = '50';
+
+      // Fade landing out
+      landing.classList.remove('active');
+
+      setTimeout(() => {
+        landing.style.zIndex = '5';      // send behind
+        landing.style.display = 'none';  // fully remove from layer stack
+
+        // Activate screen-1
+        const s1 = document.getElementById('screen-1');
+        s1.classList.add('active');
+        revealScreen(s1);
+        currentScreen = 1;
+
+        dotsWrap.classList.add('visible');
+        updateDots(1);
+      }, 780);
+    });
+
+    /* ──────────────────────────────────────────────────────────
+       9. TAP-TO-ADVANCE (on screens 1-3)
+    ────────────────────────────────────────────────────────── */
+    document.addEventListener('click', function (e) {
+      // Only screens 1, 2, 3 advance on tap
+      if (currentScreen >= 1 && currentScreen <= 3 && !transitioning) {
+        // Ignore if tapping a button
+        if (e.target.tagName === 'BUTTON') return;
+        goToScreen(currentScreen + 1);
+      }
+    });
+
+    /* ──────────────────────────────────────────────────────────
+       10. SWIPE-TO-ADVANCE (touch devices, screens 1-3)
+    ────────────────────────────────────────────────────────── */
+    let touchStartY = 0;
+    document.addEventListener('touchstart', e => {
+      touchStartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', e => {
+      const dy = touchStartY - e.changedTouches[0].clientY;
+      // Swipe up ≥ 40px = advance; only on screens 1–3
+      if (dy > 40 && currentScreen >= 1 && currentScreen <= 3 && !transitioning) {
+        goToScreen(currentScreen + 1);
+      }
+    }, { passive: true });
+
+  </script>
+
 </body>
-<script src="https://unpkg.com/magic-snowflakes/dist/snowflakes.min.js"></script>
-<script src="js/jquery.js"></script>
-<script src="js/typed.min.js"></script>
-<script src="js/script.js"></script>
-
 </html>
