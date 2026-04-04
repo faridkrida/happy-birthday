@@ -59,7 +59,7 @@
       }
 
       body {
-        height: 100%;
+        min-height: 100%;
         overflow: hidden; /* screens handle their own overflow */
         font-family: var(--ff-ui);
         -webkit-font-smoothing: antialiased;
@@ -471,9 +471,15 @@
         background:
           radial-gradient(ellipse at 20% 15%, rgba(248, 187, 208, 0.55) 0%, transparent 50%), radial-gradient(ellipse at 80% 85%, rgba(209, 186, 230, 0.45) 0%, transparent 50%),
           radial-gradient(ellipse at 50% 50%, rgba(255, 240, 245, 0.5) 0%, transparent 70%), linear-gradient(155deg, #fdf0f5 0%, #f9ecf7 40%, #fff8f0 100%);
+        /* Ubah dari fixed menjadi absolute agar bisa memanjang melebihi viewport */
+        position: absolute;
         overflow-y: auto;
-        padding: 32px 20px 80px;
+        overflow-x: hidden;
+        padding: 32px 20px 100px;
         justify-content: flex-start;
+        /* Tetap mengisi minimal penuh viewport */
+        min-height: 100%;
+        height: auto;
       }
 
       /* ============================================================
@@ -892,11 +898,8 @@
       }
 
       /* Layar tinggi (tablet portrait ke atas): konten bisa di-center */
-      @media (min-height: 750px) {
-        #screen-4 {
-          justify-content: center;
-        }
-      }
+      /* Hapus rule ini — dengan height: auto, justify-content: center
+   tidak relevan lagi dan malah bisa bikin konten tidak muncul dari atas */
     </style>
   </head>
 
@@ -1255,6 +1258,8 @@
 
           // Special: mulai read-lock saat screen-4 aktif
           if (targetNum === 4) {
+            // Aktifkan scroll body agar screen-4 bisa discroll
+            document.body.style.overflowY = "auto";
             // Beri jeda 500ms agar konten sudah terlihat baru lock dimulai
             setTimeout(startReadLock, 500);
           }
