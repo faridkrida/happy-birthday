@@ -59,8 +59,10 @@
       }
 
       body {
-        min-height: 100%;
-        overflow: hidden; /* screens handle their own overflow */
+        height: 100%;
+        /* ✅ FIX: overflow tetap hidden agar screen lain tidak bisa di-scroll,
+           tapi screen-4 akan override ini dengan position:absolute + overflow-y:auto */
+        overflow: hidden;
         font-family: var(--ff-ui);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -81,11 +83,6 @@
         pointer-events: none;
         z-index: 999;
       }
-
-      /* ============================================================
-       AUDIO — kept hidden; src="music.mp3" (repo asset)
-    ============================================================ */
-      /* The <audio> tag is in the HTML below. Controls are hidden. */
 
       /* ============================================================
        MUSIC INDICATOR — fixed, bottom-left
@@ -260,7 +257,7 @@
         background:
           radial-gradient(ellipse at 25% 25%, rgba(139, 34, 82, 0.4) 0%, transparent 55%), radial-gradient(ellipse at 75% 75%, rgba(80, 40, 120, 0.35) 0%, transparent 55%),
           radial-gradient(ellipse at 50% 50%, rgba(45, 16, 64, 0.6) 0%, transparent 80%), linear-gradient(160deg, #0e0618 0%, #1a0a2e 50%, #130820 100%);
-        z-index: 50; /* on top initially */
+        z-index: 50;
       }
 
       /* Twinkling stars */
@@ -302,10 +299,9 @@
         justify-content: center;
       }
 
-      /* Pulse rings — diperkuat agar lebih eye-catching di HP */
       .pulse-ring {
         position: absolute;
-        inset: -20px; /* lebih besar dari tombol */
+        inset: -20px;
         border-radius: 50%;
         border: 1.5px solid rgba(201, 96, 122, 0.5);
         animation: pulseRing 2s ease-out infinite;
@@ -328,7 +324,6 @@
         }
       }
 
-      /* Tombol melambung pelan agar menarik perhatian */
       @keyframes btnBounce {
         0%,
         100% {
@@ -355,7 +350,6 @@
       #btn-start {
         position: relative;
         z-index: 2;
-        /* Sedikit lebih besar di HP agar mudah ditap */
         padding: clamp(18px, 4vw, 22px) clamp(36px, 8vw, 48px);
         border: none;
         border-radius: 60px;
@@ -368,15 +362,11 @@
         font-weight: 400;
         color: var(--clr-white);
         letter-spacing: 0.02em;
-        white-space: nowrap; /* cegah text wrap di HP sempit */
+        white-space: nowrap;
 
         background: linear-gradient(135deg, #c9607a 0%, #9b4f8e 50%, #c9607a 100%);
         background-size: 200% 100%;
 
-        /*
-       * PENTING: btnBounce dijalankan setelah fadeSlideUp selesai (delay 1.6s).
-       * Ini memastikan bounce hanya terjadi saat tombol sudah terlihat penuh.
-       */
         animation:
           fadeSlideUp 1s var(--ease-out-expo) 0.6s both,
           btnShimmer 3.5s ease-in-out 1.6s infinite,
@@ -384,13 +374,12 @@
 
         box-shadow:
           0 0 40px rgba(201, 96, 122, 0.65),
-          /* glow merah-mawar */ 0 0 80px rgba(155, 79, 142, 0.3),
-          /* glow ungu luar */ 0 4px 24px rgba(0, 0, 0, 0.25),
-          /* shadow bawah agar "terangkat" */ inset 0 1px 0 rgba(255, 255, 255, 0.25);
+          0 0 80px rgba(155, 79, 142, 0.3),
+          0 4px 24px rgba(0, 0, 0, 0.25),
+          inset 0 1px 0 rgba(255, 255, 255, 0.25);
 
         transition: box-shadow 0.25s ease;
         -webkit-tap-highlight-color: transparent;
-        /* hover/active dihandle tanpa override animation */
       }
 
       #btn-start::after {
@@ -404,7 +393,6 @@
         z-index: -1;
       }
 
-      /* Hover: tambah glow, jangan override bounce */
       #btn-start:hover {
         box-shadow:
           0 0 56px rgba(201, 96, 122, 0.8),
@@ -466,27 +454,32 @@
 
       /* ============================================================
        SCREEN 4 — PESAN UTAMA
+       ✅ FIX UTAMA:
+       - position: absolute (bukan fixed) agar bisa scroll di dalam viewport
+       - overflow-y: auto untuk mengaktifkan scroll
+       - -webkit-overflow-scrolling: touch untuk smooth scroll iOS
+       - justify-content: flex-start agar konten mulai dari atas
+       - min-height: 100% agar background tetap full layar
     ============================================================ */
       #screen-4 {
         background:
           radial-gradient(ellipse at 20% 15%, rgba(248, 187, 208, 0.55) 0%, transparent 50%), radial-gradient(ellipse at 80% 85%, rgba(209, 186, 230, 0.45) 0%, transparent 50%),
           radial-gradient(ellipse at 50% 50%, rgba(255, 240, 245, 0.5) 0%, transparent 70%), linear-gradient(155deg, #fdf0f5 0%, #f9ecf7 40%, #fff8f0 100%);
-        /* Ubah dari fixed menjadi absolute agar bisa memanjang melebihi viewport */
+
+        /* ✅ FIX: pakai absolute + overflow-y agar bisa scroll */
         position: absolute;
         overflow-y: auto;
-        overflow-x: hidden;
-        padding: 32px 20px 100px;
+        -webkit-overflow-scrolling: touch;
+
+        padding: 32px 20px 100px; /* padding bawah lebih besar */
         justify-content: flex-start;
-        /* Tetap mengisi minimal penuh viewport */
         min-height: 100%;
-        height: auto;
       }
 
       /* ============================================================
        CONTENT ELEMENTS — shared across screens
     ============================================================ */
 
-      /* Generic fade+slide-up for screen content */
       .reveal {
         opacity: 0;
         transform: translateY(22px);
@@ -495,7 +488,6 @@
           transform 0.85s var(--ease-out-expo);
       }
 
-      /* When a screen is active, .reveal children animate in via JS stagger */
       .reveal.in {
         opacity: 1;
         transform: translateY(0);
@@ -667,28 +659,22 @@
         line-height: 1.3;
       }
 
-      /* Glass card — diperkuat kontras untuk mobile */
+      /* ✅ FIX: msg-card pakai height: auto agar memanjang sesuai isi */
       .msg-card {
-        width: min(90%, 580px); /* max 90% lebar layar, tidak mepet tepi di HP */
+        width: min(90%, 580px);
+        height: auto; /* ✅ FIX: tidak ada fixed height */
         margin: 0 auto;
         padding: clamp(26px, 6.5vw, 48px) clamp(22px, 5.5vw, 42px);
         border-radius: 28px;
         position: relative;
         overflow: hidden;
 
-        /*
-       * Opacity naik dari 0.58 → 0.80 agar teks tetap kontras
-       * meski background screen-4 berwarna-warni.
-       * backdrop-filter tetap untuk efek blur "frosted glass".
-       */
         background: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(28px) saturate(140%);
         -webkit-backdrop-filter: blur(28px) saturate(140%);
 
-        /* Border jelas tapi halus */
         border: 1px solid rgba(255, 255, 255, 0.9);
 
-        /* Shadow lebih tebal → card "mengambang" jelas di atas background */
         box-shadow:
           0 12px 48px rgba(201, 96, 122, 0.18),
           0 4px 16px rgba(139, 34, 82, 0.1),
@@ -724,14 +710,10 @@
 
       .msg-body {
         font-family: var(--ff-body);
-        /*
-       * clamp batas bawah dinaikkan sedikit: 1.08rem → mudah dibaca di HP 360px
-       * batas atas 1.28rem → cukup untuk desktop/tablet
-       */
         font-size: clamp(1.08rem, 3.6vw, 1.28rem);
         font-weight: 400;
-        line-height: 1.95; /* sedikit lebih longgar untuk keterbacaan */
-        color: #38151f; /* sedikit lebih gelap dari sebelumnya (#3d1a28) */
+        line-height: 1.95;
+        color: #38151f;
         text-align: center;
         letter-spacing: 0.015em;
       }
@@ -793,22 +775,19 @@
       }
 
       /* ============================================================
-       READ PROGRESS BAR — screen-4 "read lock" visual indicator
-       Tampil sebagai garis tipis di bawah layar, mengisi dalam 12 detik.
-       Menghilang setelah lock selesai (opacity → 0).
+       READ PROGRESS BAR
     ============================================================ */
       #read-progress {
         position: fixed;
         bottom: 0;
         left: 0;
         height: 3px;
-        width: 0%; /* awal: kosong */
+        width: 0%;
         background: linear-gradient(90deg, var(--clr-rose), var(--clr-lavender));
         border-radius: 0 2px 2px 0;
         z-index: 950;
         opacity: 0;
         transition: opacity 0.4s ease;
-        /* Lebar dikontrol via JS: style.width = '100%' + transition */
         will-change: width, opacity;
       }
 
@@ -816,10 +795,6 @@
         opacity: 1;
       }
 
-      /*
-     * Pesan kecil di bawah card di screen-4:
-     * muncul saat read-lock aktif, menghilang setelahnya.
-     */
       #read-lock-cue {
         display: flex;
         align-items: center;
@@ -859,9 +834,6 @@
       /* ============================================================
        RESPONSIVE FINE-TUNING
     ============================================================ */
-      /* ============================================================
-       RESPONSIVE FINE-TUNING
-    ============================================================ */
 
       /* HP sangat kecil (< 380px) */
       @media (max-width: 380px) {
@@ -874,7 +846,7 @@
           border-radius: 20px;
         }
         #screen-4 {
-          padding: 20px 14px 80px;
+          padding: 20px 14px 100px;
         }
         .msg-header {
           margin-bottom: 18px;
@@ -884,12 +856,11 @@
       /* HP standar (380–480px) */
       @media (max-width: 480px) {
         #screen-4 {
-          padding: 28px 16px 80px;
+          padding: 28px 16px 100px;
         }
         .msg-card {
           border-radius: 22px;
         }
-        /* Pastikan card tidak mepet kiri-kanan */
         .msg-card,
         .msg-header,
         .msg-ribbon {
@@ -897,16 +868,19 @@
         }
       }
 
-      /* Layar tinggi (tablet portrait ke atas): konten bisa di-center */
-      /* Hapus rule ini — dengan height: auto, justify-content: center
-   tidak relevan lagi dan malah bisa bikin konten tidak muncul dari atas */
+      /* ✅ FIX: Hapus justify-content:center di layar tinggi
+         agar konten screen-4 selalu mulai dari atas dan bisa di-scroll */
+      @media (min-height: 750px) {
+        #screen-4 {
+          justify-content: flex-start; /* ✅ FIX: bukan center */
+        }
+      }
     </style>
   </head>
 
   <body>
     <!-- ============================================================
-       AUDIO — menggunakan music.mp3 dari repo (sudah ada)
-       Volume dapat diatur di JS di bawah.
+       AUDIO
   ============================================================ -->
     <audio id="audio" loop preload="none">
       <source src="music.mp3" type="audio/mpeg" />
@@ -1013,7 +987,7 @@
       </div>
     </div>
 
-    <!-- Read progress bar — dikontrol JS, fixed di bawah layar -->
+    <!-- Read progress bar -->
     <div id="read-progress" aria-hidden="true"></div>
 
     <!-- ============================================================
@@ -1041,10 +1015,6 @@
         </div>
       </div>
 
-      <!--
-      Read-lock cue: muncul saat sedang "terkunci" (12 detik pertama),
-      menghilang setelah read-lock selesai.
-    -->
       <div id="read-lock-cue" aria-live="polite">
         <span>⏳</span>
         <span>baca dulu ya...</span>
@@ -1069,31 +1039,25 @@
       /* ──────────────────────────────────────────────────────────
        CONFIG
     ────────────────────────────────────────────────────────── */
-      const TOTAL_SCREENS = 4; // screen-1 … screen-4 (screen-0 is landing)
+      const TOTAL_SCREENS = 4;
       const AUTO_ADVANCE_DELAYS = [
         0, // screen-1: manual tap only
         0, // screen-2: manual tap only
         0, // screen-3: manual tap only
-        0, // screen-4: no auto-advance (infinite — pesan utama)
+        0, // screen-4: no auto-advance
       ];
 
-      /*
-       * READ_LOCK_MS: durasi (ms) screen-4 DIKUNCI dari tap/swipe.
-       * Selama periode ini, progress bar mengisi penuh.
-       * Set ke 0 untuk menonaktifkan fitur ini.
-       */
-      const READ_LOCK_MS = 12000; // 12 detik — cukup untuk baca pesan utama
+      const READ_LOCK_MS = 12000; // 12 detik
 
       const PARTICLE_SYMBOLS = ["🩷", "💗", "✿", "♡", "❀", "🌸", "💕", "✦", "·", "°"];
 
       /* ──────────────────────────────────────────────────────────
        STATE
     ────────────────────────────────────────────────────────── */
-      let currentScreen = 0; // 0 = landing
+      let currentScreen = 0;
       let transitioning = false;
-      let readLocked = false; // TRUE saat screen-4 sedang dalam periode baca wajib
+      let readLocked = false;
 
-      /* Elemen read-progress */
       const readProgressEl = document.getElementById("read-progress");
       const readLockCueEl = document.getElementById("read-lock-cue");
 
@@ -1157,12 +1121,11 @@
       for (let i = 0; i < TOTAL_SCREENS; i++) {
         const d = document.createElement("div");
         d.className = "dot";
-        d.dataset.idx = i + 1; // dots represent screen-1 to screen-4
+        d.dataset.idx = i + 1;
         dotsWrap.appendChild(d);
       }
 
       function updateDots(screenNum) {
-        // screenNum is 1-based (1 = screen-1)
         document.querySelectorAll(".dot").forEach((d, idx) => {
           d.classList.toggle("active", idx + 1 === screenNum);
         });
@@ -1176,44 +1139,35 @@
         items.forEach((item) => {
           item.classList.remove("in");
           const delay = parseInt(item.dataset.delay || 0, 10);
-          // stagger from 180ms base
           setTimeout(() => item.classList.add("in"), 180 + delay);
         });
       }
 
       /* ──────────────────────────────────────────────────────────
-       5a. READ LOCK — cegah skip screen-4 selama 12 detik
-           + animasi progress bar bawah layar
+       5a. READ LOCK
     ────────────────────────────────────────────────────────── */
       function startReadLock() {
-        if (READ_LOCK_MS <= 0) return; // fitur dinonaktifkan
+        if (READ_LOCK_MS <= 0) return;
 
         readLocked = true;
 
-        /* Reset & tampilkan progress bar */
         readProgressEl.style.transition = "none";
         readProgressEl.style.width = "0%";
         readProgressEl.classList.add("running");
 
-        /* Trigger reflow agar transition baru bekerja setelah reset */
         void readProgressEl.offsetWidth;
 
-        /* Animasikan lebar dari 0% → 100% selama READ_LOCK_MS */
         readProgressEl.style.transition = `width ${READ_LOCK_MS}ms linear`;
         readProgressEl.style.width = "100%";
 
-        /* Pastikan read-lock cue terlihat */
         readLockCueEl.classList.remove("unlocked");
 
-        /* Setelah durasi habis: buka kunci + sembunyikan progress bar */
         setTimeout(() => {
           readLocked = false;
 
-          /* Fade out progress bar */
           readProgressEl.style.transition = "opacity 0.5s ease";
-          readProgressEl.classList.remove("running"); // opacity → 0
+          readProgressEl.classList.remove("running");
 
-          /* Sembunyikan teks "baca dulu ya..." */
           readLockCueEl.classList.add("unlocked");
         }, READ_LOCK_MS);
       }
@@ -1231,45 +1185,42 @@
         const fromEl = document.getElementById(`screen-${currentScreen}`);
         const toEl = document.getElementById(`screen-${targetNum}`);
 
-        // Fade out current
         fromEl.classList.remove("active");
 
-        // After transition, activate next
         setTimeout(() => {
           fromEl.style.zIndex = "";
 
           toEl.style.zIndex = "10";
           toEl.classList.add("active");
+
+          /* ✅ FIX: Reset scroll ke atas saat screen-4 diaktifkan */
+          if (targetNum === 4) {
+            toEl.scrollTop = 0;
+          }
+
           revealScreen(toEl);
 
           currentScreen = targetNum;
           transitioning = false;
 
-          // Update UI
           if (targetNum >= 1) {
             dotsWrap.classList.add("visible");
             updateDots(targetNum);
           }
 
-          // Special: fire confetti on screen-3
           if (targetNum === 3) {
             setTimeout(launchConfetti, 350);
           }
 
-          // Special: mulai read-lock saat screen-4 aktif
           if (targetNum === 4) {
-            // Aktifkan scroll body agar screen-4 bisa discroll
-            document.body.style.overflowY = "auto";
-            // Beri jeda 500ms agar konten sudah terlihat baru lock dimulai
             setTimeout(startReadLock, 500);
           }
 
-          // Auto-advance if configured
           const delay = AUTO_ADVANCE_DELAYS[targetNum - 1];
           if (delay > 0 && targetNum < TOTAL_SCREENS) {
             setTimeout(() => goToScreen(targetNum + 1), delay);
           }
-        }, 780); // matches CSS transition duration
+        }, 780);
       }
 
       /* ──────────────────────────────────────────────────────────
@@ -1278,7 +1229,6 @@
       const CONFETTI_COLORS = ["#F4C2C2", "#c9607a", "#D8C8EE", "#B39DDB", "#FFD6C0", "#ffffff", "#f9a8d4", "#fde68a"];
 
       function launchConfetti() {
-        // Burst from top-left
         myConfetti({
           particleCount: 90,
           angle: 55,
@@ -1290,7 +1240,6 @@
           drift: 0.1,
         });
 
-        // Burst from top-right
         setTimeout(() => {
           myConfetti({
             particleCount: 90,
@@ -1304,7 +1253,6 @@
           });
         }, 300);
 
-        // Soft rain from center-top
         setTimeout(() => {
           myConfetti({
             particleCount: 60,
@@ -1330,34 +1278,27 @@
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
-              // Music started successfully → show indicator
               musicIndicator.classList.add("visible");
             })
-            .catch(() => {
-              // Autoplay blocked (rare after user tap) — silently ignore
-            });
+            .catch(() => {});
         }
       }
 
       /* ──────────────────────────────────────────────────────────
-       8. START BUTTON — kick everything off
+       8. START BUTTON
     ────────────────────────────────────────────────────────── */
       document.getElementById("btn-start").addEventListener("click", function () {
-        // Start music (user gesture satisfies autoplay policy)
         startMusic();
 
-        // Transition: landing (0) → screen-1
         const landing = document.getElementById("screen-0");
         landing.style.zIndex = "50";
 
-        // Fade landing out
         landing.classList.remove("active");
 
         setTimeout(() => {
-          landing.style.zIndex = "5"; // send behind
-          landing.style.display = "none"; // fully remove from layer stack
+          landing.style.zIndex = "5";
+          landing.style.display = "none";
 
-          // Activate screen-1
           const s1 = document.getElementById("screen-1");
           s1.classList.add("active");
           revealScreen(s1);
@@ -1369,19 +1310,15 @@
       });
 
       /* ──────────────────────────────────────────────────────────
-       9. TAP-TO-ADVANCE (on screens 1-3; screen-4 respect read lock)
+       9. TAP-TO-ADVANCE
+       ✅ FIX: screen-4 tidak merespons tap karena konten bisa di-scroll
     ────────────────────────────────────────────────────────── */
       document.addEventListener("click", function (e) {
-        // Abaikan klik pada tombol
         if (e.target.tagName === "BUTTON") return;
 
         if (currentScreen >= 1 && currentScreen <= 3 && !transitioning) {
           goToScreen(currentScreen + 1);
-        }
-        // Screen-4: tidak ada tap-to-advance (pesan utama tetap di layar)
-        // Jika user mengetuk saat masih terkunci, tampilkan visual feedback pada progress bar
-        else if (currentScreen === 4 && readLocked) {
-          /* Beri efek "ping" pada progress bar saat user mencoba tap terlalu cepat */
+        } else if (currentScreen === 4 && readLocked) {
           readProgressEl.style.filter = "brightness(1.4)";
           setTimeout(() => {
             readProgressEl.style.filter = "";
@@ -1391,7 +1328,7 @@
 
       /* ──────────────────────────────────────────────────────────
        10. SWIPE-TO-ADVANCE (touch devices, screens 1-3)
-           Screen-4 tidak bisa di-swipe skip selama readLocked.
+           ✅ FIX: screen-4 tidak bisa di-swipe skip agar user bisa scroll
     ────────────────────────────────────────────────────────── */
       let touchStartY = 0;
       document.addEventListener(
@@ -1406,14 +1343,10 @@
         "touchend",
         (e) => {
           const dy = touchStartY - e.changedTouches[0].clientY;
-          /*
-           * Swipe up ≥ 40px = advance, HANYA di screens 1-3.
-           * Screen-4 sengaja tidak mempunyai swipe-advance:
-           * pesan harus tetap terbuka untuk dibaca.
-           */
           if (dy > 40 && currentScreen >= 1 && currentScreen <= 3 && !transitioning) {
             goToScreen(currentScreen + 1);
           }
+          /* Screen-4: swipe tidak melakukan apa-apa agar scroll bisa berjalan */
         },
         { passive: true },
       );
